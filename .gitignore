@@ -3,6 +3,10 @@ __pycache__/
 *.py[cod]
 *$py.class
 
+polimi_challenge/Challenge1-dataset
+polimi_challenge/Challenge1-dataset.zip
+.idea
+
 # C extensions
 *.so
 
