@@ -1,6 +1,23 @@
 import torch.nn as nn
 
 
+class Resnet(nn.Module):
+
+    def __init__(self):
+        super(Resnet, self).__init__()
+
+        self.conv1 = nn.Sequential(
+            nn.Conv2d(3, 9, 36)
+            # nn.Conv2d(9, 18, 9)
+            # nn.BatchNorm2d(9)
+        )
+
+    def forward(self, x):
+        x = self.conv1(x)
+
+        return x
+
+
 class Net(nn.Module):
 
     def __init__(self, use_bn=False):

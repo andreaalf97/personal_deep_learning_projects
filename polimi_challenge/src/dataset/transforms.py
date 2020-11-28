@@ -1,8 +1,32 @@
 import torchvision
 import torch
+from torchvision.transforms import Compose
 
-DATA_MEAN = (0.5748, 0.5188, 0.4885)
-DATA_STD = (0.2855, 0.2774, 0.2793)
+from polimi_challenge.src.params import DATA_MEAN, DATA_STD, RESCALE_TO
+
+
+class Normalize(object):
+    """
+    This callable class normalizes the images
+    """
+
+    def __init__(self, mean, std):
+        assert isinstance(mean, tuple)
+        assert isinstance(std, tuple)
+        assert len(mean) == len(std) and len(mean) == 3
+        self.mean = mean
+        self.std = std
+
+    def __call__(self, sample):
+        image = sample["image"]
+
+        norm = torchvision.transforms.Normalize(self.mean, self.std)
+        image = norm(image)
+
+        return {
+            "image": image,
+            "label": sample["label"]
+        }
 
 
 class Rescale(object):
@@ -15,7 +39,7 @@ class Rescale(object):
     """
 
     def __init__(self, output_size):
-        assert isinstance(output_size, int)
+        assert isinstance(output_size, (int, tuple))
         self.output_size = output_size
 
     def __call__(self, sample):
@@ -58,20 +82,15 @@ class ToTensor(object):
         tr = torchvision.transforms.ToTensor()
         image = tr(image)
 
-        #         if int(label) == 0:
-        #             label = [1, 0, 0]
-        #         elif int(label) == 1:
-        #             label = [0, 1, 0]
-        #         else:
-        #             label = [0, 0, 1]
-
-        #         label = torch.tensor(label)
-        #         label = label.view(1, -1)
-
         label = torch.tensor(int(label))
-
-        norm = torchvision.transforms.Normalize(DATA_MEAN, DATA_STD)
-        image = norm(image)
 
         return {'image': image,
                 'label': label}
+
+
+COMPOSED_TRANSFORM = Compose([
+        ToTensor(),
+        Rescale(RESCALE_TO),
+        # RandomCrop(400),
+        Normalize(DATA_MEAN, DATA_STD)
+    ])

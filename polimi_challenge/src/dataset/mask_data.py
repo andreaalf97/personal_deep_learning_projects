@@ -1,6 +1,7 @@
 import torch
 import os
 from skimage import io
+import json
 
 from polimi_challenge.src.params import BATCH_SIZE, SHUFFLE_DATA
 
@@ -12,6 +13,10 @@ class MaskDataset(torch.utils.data.Dataset):
 
         train_root = os.path.join(root, "training")
         test_root = os.path.join(root, "test")
+
+        json_path = os.path.join(root, "train_gt.json")
+        with open(json_path, "r") as file:
+            js = json.load(file)
 
         self.samples = []
 
@@ -34,10 +39,17 @@ class MaskDataset(torch.utils.data.Dataset):
                     (os.path.join(class_root, image_name), 2)
                 )
         else:
+            missing_images = 0
+            tot = 0
             for image_name in os.listdir(test_root):
-                self.samples.append(
-                    (os.path.join(test_root, image_name), -1)
-                )
+                if image_name in js:
+                    self.samples.append(
+                        (os.path.join(test_root, image_name), js[image_name])
+                    )
+                else:
+                    missing_images += 1
+                tot += 1
+            print("Missing {} over a total of {}".format(missing_images, tot))
 
     def __len__(self):
         return len(self.samples)
