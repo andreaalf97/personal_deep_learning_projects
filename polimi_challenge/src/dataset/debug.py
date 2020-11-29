@@ -150,7 +150,6 @@ def show_batch(batch: torch.Tensor) -> None:
             plt.imshow(image.permute(1, 2, 0).cpu())
         plt.show()
         return
-
     sample = batch[0]  # The first dimension is just the batch size and we only want one sample
     if len(sample) < 9:
         print("Cannot show batches with less than 9 channels that are not RGB")
@@ -159,7 +158,7 @@ def show_batch(batch: torch.Tensor) -> None:
     rand_channels = random.sample(channels, 9)
 
     fig = plt.figure()
-    fig.suptitle("Batch sample ({})".format(list(sample.shape)))
+    fig.suptitle("Batch sample for sample 0 ({})".format(list(sample.shape)))
     for i, picked_channel in enumerate(rand_channels):
         img = sample[picked_channel]
         fig.add_subplot(3, 3, i+1)
@@ -175,7 +174,7 @@ def visualize_kernels(net: torch.nn.Module):
         print("MODULES:")
         print("Kernels sizes: [out_channels, in_channels, height, width]")
         for i, module in enumerate(net.modules()):
-            print(i, "-", type(module))
+            # print(i, "-", type(module))
             if isinstance(module, torch.nn.Conv2d):
                 weights = module.weight.data.cpu()
                 print("Conv2d {} has weight shape {}".format(i, weights.shape))
